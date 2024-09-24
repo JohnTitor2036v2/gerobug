@@ -4,7 +4,7 @@ import PyPDF2
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
-from dashboards.models import BugHunter, BugReport, BugReportUpdate, BugReportAppeal, BugReportNDA, ReportStatus
+from dashboards.models import Customer, BugHunter, BugReport, BugReportUpdate, BugReportAppeal, BugReportNDA, ReportStatus
 
 
 
@@ -271,7 +271,7 @@ def classify_action(email, subject):
                 return 207, str(hunter.hunter_scores)
             else:
                 return 403, " "
-        
+
         elif(re.search(r'^STATUS_OVERVIEW$', subject)):
             if BugHunter.objects.filter(hunter_email=email).exists():
                 if BugReport.objects.filter(hunter_email=email).exists():
@@ -281,13 +281,21 @@ def classify_action(email, subject):
                         status = status.status_name
                         x = "<tr><td>&ensp;"+report.report_id+"&ensp;</td><td>&ensp;"+report.report_title+"&ensp;</td><td>&ensp;"+status+"&ensp;</td></tr>"
                         reports.append(x)
-                    
+
                     return 208, reports
                 else:
                     return 403, " "
             else:
                 return 403, " "
-            
+
+        elif(re.search(r'^CUSTOMER_', subject)):
+            customer_id = subject[9:]
+            if Customer.objects.filter(id=customer_id).exists():
+                customer = Customer.objects.get(id=customer_id)
+                return 209, customer.name
+            else:
+                return 404, " "
+
         else:
             return 404, " "
 

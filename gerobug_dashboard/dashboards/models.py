@@ -11,12 +11,20 @@ from colorfield.fields import ColorField
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 
+class Customer(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+
+    def __str__(self):
+        return self.name
+
 class BugReport(models.Model):
-    report_id = models.CharField(max_length=15,primary_key=True,validators=[alphanumeric])
+    report_id = models.CharField(max_length=15, primary_key=True, validators=[alphanumeric])
     report_datetime = models.DateTimeField()
     hunter_email = models.EmailField()
     report_reviewer = models.CharField(max_length=25, verbose_name="Report Reviewer")
     report_title = models.CharField(max_length=150, default='NO TITLE')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     report_endpoint = models.CharField(max_length=150, default='NO ENDPOINT')
     report_attack = models.CharField(max_length=100, default='NO ATTACK TYPE')
     report_summary = models.TextField()
@@ -28,17 +36,17 @@ class BugReport(models.Model):
     report_permission = models.IntegerField(default=0) # 4 (Update) 2 (Appeal) 1 (NDA) --> UAN --> Similar to RWX System
     report_update = models.IntegerField(default=0)
     report_appeal = models.IntegerField(default=0)
-    report_nda  = models.IntegerField(default=0)
+    report_nda = models.IntegerField(default=0)
 
     class Meta:
-      ordering = ['-report_datetime']
-      # order_with_respect_to = "report_datetime"
-    
+        ordering = ['-report_datetime']
+        # order_with_respect_to = "report_datetime"
+
     def __str__(self):
         return self.hunter_email
-    
+
     def get_absolute_url(self):
-        return reverse('report_detail', kwargs={'pk':self.report_id})
+        return reverse('report_detail', kwargs={'pk': self.report_id})
 
 
 class BugReportUpdate(models.Model):

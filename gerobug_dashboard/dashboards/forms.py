@@ -1,5 +1,5 @@
 from django import forms
-from dashboards.models import StaticRules, Personalization
+from dashboards.models import StaticRules, Personalization, Customer
 from dashboards.rulestemplate import *
 from dashboards.validators import *
 from django.core.validators import *
@@ -33,6 +33,15 @@ class MailboxForm(forms.Form):
     mailbox_email = forms.CharField(widget=forms.EmailInput(attrs={'id':'mailbox_email', 'placeholder': 'Email', 'style': 'width: 100%;', 'class': 'form-control'}))
     mailbox_password = forms.CharField(widget=forms.PasswordInput(attrs={'id':'mailbox_password', 'placeholder': 'Password', 'style': 'width: 100%;', 'class': 'form-control'}))
     mailbox_type = forms.ChoiceField(choices=CHOICES,label="Email Type")
+
+class CustomerForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ['name', 'email']
+        labels = {
+            'name': 'Customer Name',
+            'email': 'Customer Email'
+        }
 
 class AccountForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'id':'username', 'placeholder': 'Username', 'style': 'width: 100%;', 'class': 'form-control'}))

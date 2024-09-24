@@ -17,8 +17,8 @@ from django.db.models import Sum
 from django.http import FileResponse
 from django.middleware.csrf import get_token
 from prerequisites.models import MailBox, Webhook
-from .models import BugHunter, BugReport, BugReportUpdate, BugReportAppeal, BugReportNDA, ReportStatus, StaticRules, BlacklistRule, CertificateData, Personalization
-from .forms import Requestform, RulesGuidelineForm, CompleteRequestform, MailboxForm, AccountForm, ReviewerForm, WebhookForm, BlacklistForm, TemplateReportForm, TemplateNDAForm, TemplateCertForm, CertDataForm, PersonalizationForm, CompanyIdentityForm, Invalidform, TroubleshootForm
+from .models import Customer, BugHunter, BugReport, BugReportUpdate, BugReportAppeal, BugReportNDA, ReportStatus, StaticRules, BlacklistRule, CertificateData, Personalization
+from .forms import CustomerForm, Requestform, RulesGuidelineForm, CompleteRequestform, MailboxForm, AccountForm, ReviewerForm, WebhookForm, BlacklistForm, TemplateReportForm, TemplateNDAForm, TemplateCertForm, CertDataForm, PersonalizationForm, CompanyIdentityForm, Invalidform, TroubleshootForm
 from sys import platform
 from geromail import geromailer, gerofilter, geroparser, gerocalculator
 from gerobug.settings import MEDIA_ROOT, BASE_DIR
@@ -102,7 +102,7 @@ class ReportDelete(LoginRequiredMixin,DeleteView):
         super().delete(*args, **kwargs)
         #self.object.delete()
 
-        # DELETE ALL CHILD UAN OBJECT
+        # KILL ALL CHILD UAN OBJECT
         if BugReportUpdate.objects.filter(report_id=self.object.report_id).exists():
             BugReportUpdate.objects.filter(report_id=self.object.report_id).delete()
 
@@ -399,6 +399,13 @@ def AdminSetting(request):
             messages.success(request,"Mailbox updated successfully.")
             return redirect('setting')
 
+        customer_form = CustomerForm(request.POST)
+        if customer_form.is_valid():
+            customer_form.save()
+            messages.success(request, "Customer added successfully!")
+            logging.getLogger("Gerologger").info("Customer added successfully")
+            return redirect('setting')
+
         account = AccountForm(request.POST)
         if account.is_valid():
             username = account.cleaned_data.get('username')
@@ -565,10 +572,27 @@ def AdminSetting(request):
 
     THEME = Personalization.objects.get(personalize_id=1)
     RULES = StaticRules.objects.get(pk=1)
-    return render(request,'setting.html',
-                  {'form': RulesGuidelineForm(instance=RULES), 'mailbox': MailboxForm(), 'account': AccountForm(),'reviewer': ReviewerForm(),'webhooks': WebhookForm(),'blacklistrule': BlacklistForm(),
-                    'templatereport': TemplateReportForm(), 'templatenda': TemplateNDAForm(), 'templatecert': TemplateCertForm(), 'certdata': CertDataForm(), 'companyidentity': CompanyIdentityForm(),
-                    'personalization': PersonalizationForm(instance=THEME), 'troubleshoot': TroubleshootForm(), 'users':users, 'mailbox_status': mailbox_status,'mailbox_name': mailbox_name,'notifications':notifications,'bl':bl})
+    return render(request, 'setting.html', {
+        'form': RulesGuidelineForm(instance=RULES),
+        'mailbox': MailboxForm(),
+        'customer_form': CustomerForm(), # Add the new form to the context
+        'account': AccountForm(),
+        'reviewer': ReviewerForm(),
+        'webhooks': WebhookForm(),
+        'blacklistrule': BlacklistForm(),
+        'templatereport': TemplateReportForm(),
+        'templatenda': TemplateNDAForm(),
+        'templatecert': TemplateCertForm(),
+        'certdata': CertDataForm(),
+        'companyidentity': CompanyIdentityForm(),
+        'personalization': PersonalizationForm(instance=THEME),
+        'troubleshoot': TroubleshootForm(),
+        'users': users,
+        'mailbox_status': mailbox_status,
+        'mailbox_name': mailbox_name,
+        'notifications': notifications,
+        'bl': bl
+    })
 
 @login_required
 def ReviewerDelete(request,id):
@@ -627,6 +651,24 @@ def emailcontext(request,):
     else:
         template = "Currently the company hasn't set their email yet. Please contact the admin/wait for the mailbox setup."
     return render(request, 'submit.html',{'template':template})
+
+
+def halloffame(request):
+    selected_customer = request.GET.get('customer', 'All')
+    customers = Customer.objects.all()
+
+    if selected_customer == 'All':
+        hunters = BugHunter.objects.all().order_by('-hunter_scores')
+    else:
+        hunters = BugHunter.objects.filter(customer__name=selected_customer).order_by('-hunter_scores')
+
+    context = {
+        'hunters': hunters,
+        'customers': customers,
+        'selected_customer': selected_customer
+    }
+    return render(request, 'halloffame.html', context)
+
 
 def halloffame(request,):
     bughunters = BugHunter.objects.alias(

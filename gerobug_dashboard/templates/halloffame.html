@@ -9,7 +9,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="Gerobug-signature" content="97de67b8d672c51c158247f398b85d31">
-  
+
   <title>Hall Of Fame</title>
   <link rel="shortcut icon" href='{% static "favicon.ico" %}' type="image/x-icon">
   <link rel="icon" href='{% static "favicon.ico" %}' type="image/x-icon">
@@ -27,7 +27,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
   integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  
+
   <script>
     function myFunction() {
       var x = document.getElementById("navbar");
@@ -67,7 +67,17 @@
       <img src="{% static 'leaderboard.png' %}">
     </div>
     <p>Gerobug thanks the following researchers for reporting valid security issues</p>
-        
+
+    <form method="get" action="{% url 'halloffame' %}">
+      <label for="customer">Select Customer:</label>
+      <select name="customer" id="customer" onchange="this.form.submit()">
+        <option value="All" {% if selected_customer == 'All' %}selected{% endif %}>All</option>
+        {% for customer in customers %}
+          <option value="{{ customer.name }}" {% if selected_customer == customer.name %}selected{% endif %}>{{ customer.name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+
     <table id="leaderboard">
       <thead>
         <tr>
