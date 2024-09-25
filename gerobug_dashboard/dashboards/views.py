@@ -365,26 +365,33 @@ def AdminSetting(request):
                 groupreviewer = Group.objects.get(name='Reviewer')
                 reviewername = reviewer.cleaned_data.get('reviewername')
                 revieweremail = reviewer.cleaned_data.get('reviewer_email')
+                is_customer = reviewer.cleaned_data.get('is_customer')
+
                 if User.objects.filter(Q(username__exact=reviewername)).count() > 0:
-                    messages.error(request,"Username already used. Please try another username!")
+                    messages.error(request, "Username already used. Please try another username!")
                     logging.getLogger("Gerologger").error("Username already used!")
                     return redirect("setting")
                 elif User.objects.filter(Q(email__exact=revieweremail)).count() > 0:
-                    messages.error(request,"Email already used. Please try another email!")
+                    messages.error(request, "Email already used. Please try another email!")
                     logging.getLogger("Gerologger").error("Email already used!")
                     return redirect("setting")
                 else:
-                    reviewerpassword = "G3r0bUg_@dM!n_1337yipPie13579246810121337" #default pw, change since this is temp
-                    revieweraccount = User.objects.create(username=reviewername,email=revieweremail)
+                    reviewerpassword = "G3r0bUg_@dM!n_1337yipPie13579246810121337"  # default pw, change since this is temp
+                    revieweraccount = User.objects.create(username=reviewername, email=revieweremail)
                     revieweraccount.set_password(reviewerpassword)
                     revieweraccount.groups.add(groupreviewer)
                     revieweraccount.save()
+
+                    if is_customer:
+                        Customer.objects.create(name=reviewername, email=revieweremail, user=revieweraccount)
+
                     logging.getLogger("Gerologger").info("Reviewer is created successfully")
-                    messages.success(request,"Reviewer is created successfully!")
+                    messages.success(request, "Reviewer is created successfully!")
                     return redirect('setting')
             except Exception as e:
                 logging.getLogger("Gerologger").error(str(e))
-                messages.error(request,"Something's wrong. Perhaps your username/email is already used. Please specify another one!")
+                messages.error(request,
+                               "Something's wrong. Perhaps your username/email is already used. Please specify another one!")
                 return redirect("setting")
 
         mailbox = MailboxForm(request.POST)

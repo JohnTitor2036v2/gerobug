@@ -34,16 +34,6 @@ class MailboxForm(forms.Form):
     mailbox_password = forms.CharField(widget=forms.PasswordInput(attrs={'id':'mailbox_password', 'placeholder': 'Password', 'style': 'width: 100%;', 'class': 'form-control'}))
     mailbox_type = forms.ChoiceField(choices=CHOICES,label="Email Type")
 
-class CustomerForm(forms.Form):
-    name = forms.CharField(
-        widget=forms.TextInput(attrs={'id': 'name', 'placeholder': 'Customer Name', 'style': 'width: 100%;', 'class': 'form-control'}),
-        label="Customer Name"
-    )
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={'id': 'email', 'placeholder': 'Customer Email', 'style': 'width: 100%;', 'class': 'form-control'}),
-        label="Customer Email"
-    )
-
 class AccountForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'id':'username', 'placeholder': 'Username', 'style': 'width: 100%;', 'class': 'form-control'}))
     user_email = forms.CharField(widget=forms.EmailInput(attrs={'id':'user_email', 'placeholder': 'Email', 'style': 'width: 100%;', 'class': 'form-control'}))
@@ -52,6 +42,7 @@ class AccountForm(forms.Form):
 class ReviewerForm(forms.Form):
     reviewername = forms.CharField(widget=forms.TextInput(attrs={'id':'reviewername', 'placeholder': 'Reviewer\'s Username', 'style': 'width: 100%;', 'class': 'form-control'}),label="Reviewer's Name")
     reviewer_email = forms.CharField(widget=forms.EmailInput(attrs={'id':'reviewer_email', 'placeholder': 'Reviewer\'s Email', 'style': 'width: 100%;', 'class': 'form-control'}),label="Reviewer's Email")
+    is_customer = forms.BooleanField(required=False, label="Is Customer")
 
 class WebhookForm(forms.Form):
     CHOICES = (('SLACK', 'Slack'),('TELEGRAM', 'Telegram'),)

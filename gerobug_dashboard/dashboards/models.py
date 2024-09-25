@@ -4,6 +4,7 @@ from unittest.util import _MAX_LENGTH
 from django.db import models
 from django.urls import reverse
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator, MinLengthValidator
+from django.contrib.auth.models import User
 from django_quill.fields import QuillField
 from .rulestemplate import *
 from colorfield.fields import ColorField
@@ -14,9 +15,7 @@ alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters a
 class Customer(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
-
-    def __str__(self):
-        return self.name
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 class BugReport(models.Model):
     report_id = models.CharField(max_length=15, primary_key=True, validators=[alphanumeric])
