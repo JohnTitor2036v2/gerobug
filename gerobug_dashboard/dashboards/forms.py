@@ -40,9 +40,19 @@ class AccountForm(forms.Form):
     user_password = forms.CharField(widget=forms.PasswordInput(attrs={'id':'user_password', 'placeholder': 'Password', 'style': 'width: 100%;', 'class': 'form-control'}))
 
 class ReviewerForm(forms.Form):
-    reviewername = forms.CharField(widget=forms.TextInput(attrs={'id':'reviewername', 'placeholder': 'Reviewer\'s Username', 'style': 'width: 100%;', 'class': 'form-control'}),label="Reviewer's Name")
-    reviewer_email = forms.CharField(widget=forms.EmailInput(attrs={'id':'reviewer_email', 'placeholder': 'Reviewer\'s Email', 'style': 'width: 100%;', 'class': 'form-control'}),label="Reviewer's Email")
-    is_customer = forms.BooleanField(required=False, label="Is Customer")
+    reviewername = forms.CharField(
+        widget=forms.TextInput(attrs={'id': 'reviewername', 'placeholder': 'Reviewer\'s Username', 'style': 'width: 100%;', 'class': 'form-control'}),
+        label="Reviewer's Name"
+    )
+    reviewer_email = forms.CharField(
+        widget=forms.EmailInput(attrs={'id': 'reviewer_email', 'placeholder': 'Reviewer\'s Email', 'style': 'width: 100%;', 'class': 'form-control'}),
+        label="Reviewer's Email"
+    )
+    is_customer = forms.BooleanField(
+        required=False,
+        label="Is Customer",
+        widget=forms.CheckboxInput(attrs={'id': 'is_customer', 'class': 'form-check-input'})
+    )
 
 class WebhookForm(forms.Form):
     CHOICES = (('SLACK', 'Slack'),('TELEGRAM', 'Telegram'),)
